@@ -4,6 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+use function Laravel\Prompts\table;
+
 return new class extends Migration
 {
     /**
@@ -13,6 +15,11 @@ return new class extends Migration
     {
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->nullable();
+            $table->string('question', 500);
+            $table->string('type', 20);
+            $table->json("choices");
+            $table->foreignId('agency_id')->constrained();
             $table->timestamps();
         });
     }
