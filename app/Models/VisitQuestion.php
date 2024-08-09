@@ -14,6 +14,6 @@ class VisitQuestion extends Model
 
     public function uniqueIds(): array
     {
-        return ['id', 'uuid'];
+        return ['uuid'];
     }
 }

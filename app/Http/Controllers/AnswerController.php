@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\QuestionSetResource;
 use App\Models\QuestionSet;
+use App\Models\Visit;
 use Illuminate\Http\Request;
 
 class AnswerController extends Controller
@@ -19,36 +20,23 @@ class AnswerController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, QuestionSet $questionSet)
-    {
-         
-        //$questionsSet = QuestionSet::where('id', $questionSet)->first();
-        QuestionSet::updateOrCreate(
-            [ 'id' => $questionSet],
-            [
-            'question_order'=> $request->input('question_order'),
-            'selected_key'=> $request->input('selected_key'),
-            ]
-            );
-        // if(empty($questionsSet)){
-        //     $$questionsSet->create([
-        //     'question_order'=> $request->input('question_order'),
-        //     'selected_key'=> $request->input('selected_key'),
-        //    ]);
-        // }
+    public function store(Request $request, Visit $visit)
+    {       
+        $visits = QuestionSet::where('visit_id', $visit->id)->get();
 
-        // $questionsSet->update([
-        //     'question_order'=> $request->input('question_order'),
-        //     'selected_key'=> $request->input('selected_key'),
-        // ]);
+        foreach ($visits as $questionSet) {
+            $questionSet->update([
+                'question_order' => $request->input('question_order'),
+                'selected_key' => $request->input('selected_key'),
+            ]);
+        }
 
         return response()->json([
             "status" => true,
             "message" => "question set successfully created",
-            "data" => QuestionSetResource::make($questionSet)
-        ]);
-
-    }
+            "data" => QuestionSetResource::collection($visits)
+        ]); 
+}
 
     /**
      * Display the specified resource.

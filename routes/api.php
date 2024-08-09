@@ -21,7 +21,7 @@ Route::middleware(AuthMiddleware::class)->group(function(){
     Route::apiResource('question', QuestionsController::class);
     Route::apiResource('answers', AnswerController::class);
     Route::apiResource('visits', VisitController::class);
-    Route::put('/visit/{id}/answer', [AnswerController::class, 'store']);
+    Route::put('/visit/{visit}/answer', [AnswerController::class, 'store']);
 
 });
 
