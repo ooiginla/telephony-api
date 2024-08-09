@@ -5,6 +5,7 @@ use App\Http\Controllers\PatientsController;
 use App\Http\Controllers\QuestionsController;
 use App\Http\Controllers\AnswerController;
 use App\Http\Controllers\VisitController;
+use App\Http\Middleware\AuthMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
  
@@ -13,11 +14,13 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // })->middleware('auth:sanctum');
 
-Route::apiResource('agency', AgencyController::class);
-Route::apiResource('patient', PatientsController::class);
-Route::apiResource('question', QuestionsController::class);
+Route::middleware(AuthMiddleware::class)->group(function(){
 
+    Route::apiResource('agency', AgencyController::class);
+    Route::apiResource('patient', PatientsController::class);
+    Route::apiResource('question', QuestionsController::class);
+    Route::apiResource('answers', AnswerController::class);
+    Route::apiResource('visits', VisitController::class);
 
-Route::apiResource('answers', AnswerController::class);
+});
 
-Route::apiResource('visits', VisitController::class);
