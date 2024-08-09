@@ -22,9 +22,12 @@ class AnswerController extends Controller
      */
     public function store(Request $request, Visit $visit)
     {       
-        $visits = QuestionSet::where('visit_id', $visit->id)->get();
+        $visits = QuestionSet::where('visit_id', $visit->id)->first();
+
+        dd($visits->questions());
 
         foreach ($visits as $questionSet) {
+            //if($questionSet->visit_id === )
             $questionSet->update([
                 'question_order' => $request->input('question_order'),
                 'selected_key' => $request->input('selected_key'),
