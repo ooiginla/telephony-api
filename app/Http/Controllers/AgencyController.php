@@ -53,10 +53,25 @@ class AgencyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(AgencyRequest $request, Agency $agency)
+    public function update(Request $request, Agency $agency)
     {
-        $agency->update($request->validated());
-        return AgencyResource::make($agency);
+
+        $request->validate([
+            'name' => 'required',
+            'agency_id' => 'required'
+        ]);
+        
+        $agency = $agency->update([
+            'name'=> $request->input('name'),
+            'uuid'=> $request->input('agency_id'),
+            'profile_id'=> $request->input('profile_id'),
+        ]);
+
+        return response()->json([
+            "status" => true,
+            "message" => "agency successfully created",
+            "data" => AgencyResource::make($agency)
+        ]);
     }
 
     /**
