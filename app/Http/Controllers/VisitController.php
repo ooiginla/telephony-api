@@ -11,26 +11,29 @@ use App\Models\QuestionSet;
 
 class VisitController extends Controller
 {
-    public function create(Request $request)
+    public function store(Request $request)
     {
         $request->validate([
             'agency_id' => 'required',
-            'patient_id' => 'required',
-            'user_id' => 'required',
-            'visit_date' => 'required',
-            'questions' => 'required'
+            'visits' => 'required',
+            'questions' => 'required',
+            'visits.*.visit_date' => 'required',
+            'visits.*.clinician_id' => 'required',
+            'visits.*.patient_id' => 'required',
         ]);
 
         $agency_id = $request->input('agency_id');
+        $profile_id = $request->input('profile_id', 1);
 
-        $agency = Agency::find('id', $agency_id);
+        $agency = Agency::where('profile_id',$profile_id)->where('uuid', $agency_id)->first();
 
+        // Agency doesn't exist?
         if (empty($agency)) {
-             // throw a failure
-             return response()->json([
-                'status' => false,
-                'message' => 'Agency not found',
-                'data' => null
+            // Create Agency
+            $agency = Agency::create([
+                'name'=> $request->input('agency_name',''),
+                'uuid'=> $request->input('agency_id'),
+                'profile_id'=> $profile_id
             ]);
         }
 

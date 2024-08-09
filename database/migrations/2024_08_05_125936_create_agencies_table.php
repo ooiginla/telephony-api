@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('agencies', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->nullable();
-            $table->string("name");
+            $table->string("name")->nullable();
             $table->timestamps();
             $table->foreignId("profile_id")->constrained();
         });

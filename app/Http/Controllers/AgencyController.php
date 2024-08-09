@@ -22,11 +22,24 @@ class AgencyController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(AgencyRequest $request)
+    public function store(Request $request)
     {
-       
-        $agency = Agency::create($request->validated());
-        return AgencyResource::make($agency);
+        $request->validate([
+            'name' => 'required',
+            'agency_id' => 'required'
+        ]);
+
+        $agency = Agency::create([
+            'name'=> $request->input('name'),
+            'uuid'=> $request->input('agency_id'),
+            'profile_id'=> $request->input('profile_id'),
+        ]);
+
+        return response()->json([
+            "status" => true,
+            "message" => "agency successfully created",
+            "data" => AgencyResource::make($agency)
+        ]);
     }
 
     /**
