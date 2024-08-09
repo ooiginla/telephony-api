@@ -16,6 +16,7 @@ return new class extends Migration
             $table->uuid('uuid')->nullable();
             $table->string("name");
             $table->timestamps();
+            $table->foreignId("profile_id")->constrained();
         });
     }
 
