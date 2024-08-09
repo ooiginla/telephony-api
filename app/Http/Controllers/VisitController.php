@@ -89,7 +89,7 @@ class VisitController extends Controller
                 $question_model = new Question;
                 $question_model->question = $question_item->question;
                 $question_model->type= $question_item->type;
-                $question_model->choices = $question_item->choices;
+                $question_model->choices = json_encode($question_item->choices);
                 $question_model->agency_id = $agency->id;
                 $question_model->save();
 
