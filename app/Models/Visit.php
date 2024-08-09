@@ -14,6 +14,6 @@ class Visit extends Model
 
     public function uniqueIds(): array
     {
-        return ['id', 'uuid'];
+        return ['uuid'];
     }
 }
