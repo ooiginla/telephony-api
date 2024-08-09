@@ -21,6 +21,7 @@ return new class extends Migration
             $table->json("choices");
             $table->foreignId('agency_id')->constrained();
             $table->timestamps();
+            $table->foreignId("profile_id")->constrained();
         });
     }
 

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->timestampTz('visit_date');
             $table->boolean('is_complete');
             $table->timestamps();
+            $table->foreignId("profile_id")->constrained();
         });
     }
 

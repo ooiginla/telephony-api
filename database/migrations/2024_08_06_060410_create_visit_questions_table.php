@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('visit_questions', function (Blueprint $table) {
+        Schema::create('question_sets', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->nullable();
             $table->foreignId('visit_id')->constrained();
@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string("selected_answer");
             $table->timestampTz("answered_date");
             $table->timestamps();
+            $table->foreignId("profile_id")->constrained();
         });
     }
 

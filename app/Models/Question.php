@@ -18,7 +18,7 @@ class Question extends Model
 
     public function uniqueIds(): array
     {
-        return ['id', 'uuid'];
+        return ['uuid'];
     }
 
     public function getRouteKeyName()
