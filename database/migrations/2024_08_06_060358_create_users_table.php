@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('pin');
+            $table->string('name')->nullable();;
+            $table->string('pin')->nullable();;
             $table->timestamps();
+            $table->uuid('uuid');
             $table->foreignId("profile_id")->constrained();
             $table->foreignId('agency_id')->constrained();
         });

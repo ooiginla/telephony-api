@@ -17,12 +17,11 @@ return new class extends Migration
             $table->foreignId('visit_id')->constrained();
             $table->foreignId('question_id')->constrained();
             $table->string('question_type');
-            $table->string('question_order');
-            $table->string("selected_key");
-            $table->string("selected_answer");
-            $table->timestampTz("answered_date");
+            $table->string('question_no');
+            $table->string("selected_key")->nullable();
+            $table->string("selected_answer")->nullable();
+            $table->timestampTz("answered_date")->nullable();
             $table->timestamps();
-            $table->foreignId("profile_id")->constrained();
         });
     }
 

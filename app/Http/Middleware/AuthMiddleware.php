@@ -34,7 +34,7 @@ class AuthMiddleware
          
         if($profile->exists()){
                  if($profile->auth_key ===  $authKey){
-                    $request->merge(['profile_id' => $profile->id]);
+                    $request->merge(['profile' => $profile]);
                     return $next($request);
                  }else{
                     return response()->json([

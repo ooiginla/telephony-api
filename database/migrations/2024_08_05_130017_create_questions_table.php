@@ -18,6 +18,7 @@ return new class extends Migration
             $table->uuid('uuid')->nullable();
             $table->string('question', 500);
             $table->string('type', 20);
+            $table->string('hash', 60);
             $table->json("choices");
             $table->foreignId('agency_id')->constrained();
             $table->timestamps();
