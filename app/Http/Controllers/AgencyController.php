@@ -32,7 +32,7 @@ class AgencyController extends Controller
         $agency = Agency::create([
             'name'=> $request->input('name'),
             'uuid'=> $request->input('agency_id'),
-            'profile_id'=> $request->input('profile_id'),
+            'profile_id'=> $request->input('profile')->id,
         ]);
 
         return response()->json([

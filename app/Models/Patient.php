@@ -14,7 +14,7 @@ class Patient extends Model
 
     use HasUuids;
 
-    protected $fillable = ['phone_number', 'agency_id'];
+    protected $fillable = ['phone_number', 'agency_id','uuid','profile_id'];
 
     public function uniqueIds(): array
     {
