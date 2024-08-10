@@ -16,4 +16,9 @@ class Visit extends Model
     {
         return ['uuid'];
     }
+
+    public function questions()
+    {
+        return $this->belongsToMany(Question::class, 'question_sets');
+    }
 }

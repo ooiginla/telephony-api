@@ -10,8 +10,5 @@ class QuestionSet extends Model
 {
     use HasFactory;
 
-    public function questions():HasMany
-    {
-        return $this->hasMany(Question::class);
-    }
+
 }

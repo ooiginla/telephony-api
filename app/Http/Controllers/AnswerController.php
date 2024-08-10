@@ -22,23 +22,29 @@ class AnswerController extends Controller
      */
     public function store(Request $request, Visit $visit)
     {       
-        $visits = QuestionSet::where('visit_id', $visit->id)->first();
 
-        dd($visits->questions());
+        //This is getting all the questions that is related to this visit Id
+         foreach($visit->questions as $question){
+            
+            dd($question);
+         }
+        
 
-        foreach ($visits as $questionSet) {
-            //if($questionSet->visit_id === )
-            $questionSet->update([
-                'question_order' => $request->input('question_order'),
-                'selected_key' => $request->input('selected_key'),
-            ]);
-        }
+        //dd($visits->questions());
 
-        return response()->json([
-            "status" => true,
-            "message" => "question set successfully created",
-            "data" => QuestionSetResource::collection($visits)
-        ]); 
+        // foreach ($visits as $questionSet) {
+        //     //if($questionSet->visit_id === )
+        //     $questionSet->update([
+        //         'question_order' => $request->input('question_order'),
+        //         'selected_key' => $request->input('selected_key'),
+        //     ]);
+        // }
+
+        // return response()->json([
+        //     "status" => true,
+        //     "message" => "question set successfully created",
+        //     "data" => QuestionSetResource::collection($visits)
+        // ]); 
 }
 
     /**
