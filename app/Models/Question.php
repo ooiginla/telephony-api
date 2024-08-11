@@ -27,12 +27,12 @@ class Question extends Model
         return 'uuid';
     }
 
-    protected function casts(): array
-    {
-        return [
-            'choices' => 'json',
-        ];
-    }
+    // protected function casts(): array
+    // {
+    //     return [
+    //         'choices' => 'json',
+    //     ];
+    // }
 
     public function agency():BelongsTo
     {
