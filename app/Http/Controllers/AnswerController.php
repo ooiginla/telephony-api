@@ -43,24 +43,11 @@ class AnswerController extends Controller
                 $questionSet->refresh();
             }
         }
-        
-        
-
-        //dd($visits->questions());
-
-        // foreach ($visits as $questionSet) {
-        //     //if($questionSet->visit_id === )
-        //     $questionSet->update([
-        //         'question_order' => $request->input('question_order'),
-        //         'selected_key' => $request->input('selected_key'),
-        //     ]);
-        // }
-
-        // return response()->json([
-        //     "status" => true,
-        //     "message" => "question set successfully created",
-        //     "data" => QuestionSetResource::collection($visits)
-        // ]); 
+        return response()->json([
+            "status" => true,
+            "message" => "question set successfully created",
+            "data" => QuestionSetResource::make($questionSet)
+        ]); 
 }
 
     /**

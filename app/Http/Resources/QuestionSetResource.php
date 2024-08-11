@@ -16,7 +16,8 @@ class QuestionSetResource extends JsonResource
     {
         return  [
             'question_order' => $this->question_order,
-            'selected_key' => $this->selected_key
+            'selected_key' => $this->selected_key,
+            'selected_answer' => $this->selected_answer
         ];
     }
 }
