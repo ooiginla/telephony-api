@@ -16,10 +16,11 @@ return new class extends Migration
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->nullable();
+            $table->string('name', 500)->nullable();
             $table->string('question', 500);
             $table->string('type', 20);
             $table->string('hash', 60);
-            $table->json("choices");
+            $table->json("choices")->nullable();
             $table->foreignId('agency_id')->constrained();
             $table->timestamps();
             $table->foreignId("profile_id")->constrained();

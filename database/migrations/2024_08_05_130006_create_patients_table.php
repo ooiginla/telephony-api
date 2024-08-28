@@ -14,9 +14,18 @@ return new class extends Migration
         Schema::create('patients', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->nullable();
-            $table->string('phone_number')->nullable();
-            $table->foreignId('agency_id')->constrained();
+            $table->string('first_name')->nullable();
+            $table->string('last_name')->nullable();
+            $table->string('middle_name')->nullable();
+            $table->string('address')->nullable();
+            $table->string('city')->nullable();
+            $table->string('state')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('zipcode')->nullable();
+            $table->string('phone')->nullable();
             $table->timestamps();
+
+            $table->foreignId('agency_id')->constrained();
             $table->foreignId("profile_id")->constrained();
         });
     }

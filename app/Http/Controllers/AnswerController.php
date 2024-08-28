@@ -45,8 +45,6 @@ class AnswerController extends Controller
             }
         }
 
-        QuestionSet::
-
         return response()->json([
             "status" => true,
             "message" => "answered set successfully updated",

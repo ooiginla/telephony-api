@@ -11,6 +11,6 @@ class Profile extends Model
 
     public function retrieve($profile_key=null)
     {
-        return $this->where('auth_key', $profile_key)->first();
+        return $this->where('auth_user', $profile_key)->first();
     }
 }

@@ -18,9 +18,9 @@ class Continulink
 
     public  $profile;
 
-    public function __construct()
+    public function __construct(Profile $profile)
     {
-        $this->profile = Profile::retrieve('continulink');
+        $this->profile = $profile->retrieve('continulink');
     }
 
     public function process($payload)
@@ -42,12 +42,28 @@ class Continulink
         if(empty($agency)) {
             $agency = new Agency;
             $agency->uuid = $agency_id;
-            $agency->uuid = $this->profile->id;
+            $agency->profile_id = $this->profile->id;
             $agency->name = $agency_name;
             $agency->save();
         }
 
         return $agency;
+    }
+
+    public function grabClientPhone($clientPhones)
+    {
+        $phone_list = $clientPhones['clientPhones'];
+        $phone = "";
+        $prefix = "";
+
+        foreach($phone_list as $phone_entry) 
+        {
+           $prefix =  (!empty($phone)) ? "|":"";
+
+           $phone .= $prefix.$phone_entry['phone'];
+        }
+
+        return $phone;
     }
 
     public function processEmployee($item) 
@@ -65,10 +81,11 @@ class Continulink
                 return;
             }
 
-            $user = User::where('profile_id',$this->profile->id)->where('uuid')->first();
+            $user = User::where('profile_id', $this->profile->id)->where('uuid', $employee['external_id'])->first();
 
             if (empty($user)) {
                 $user = new User;
+                $user->uuid = $employee['external_id'];
                 $user->first_name = $employee['first_name'] ?? '';
                 $user->last_name = $employee['last_name'] ?? '';
                 $user->middle_name = $employee['middle_name'] ?? '';
@@ -81,7 +98,7 @@ class Continulink
                 $user->status = $employee['active'] ?? false;
 
                 $user->profile_id = $this->profile->id;
-                $user->agency_id = $this->setOrCreateAgency($employee['agency_id']);
+                $user->agency_id = $this->setOrCreateAgency($employee['agency_id'])->id;
                 $user->save();   
             }
        }
@@ -99,7 +116,29 @@ class Continulink
             $clientAddress = $clientObj['clientAddress'] ?? null;
             $gpsCoords = $clientObj['gpsCoords'] ?? null;
             $episode = $clientObj['episode'] ?? null;
-       }
+
+            if(empty($client)){
+                return;
+            }
+
+            $patient = Patient::where('profile_id',$this->profile->id)->where('uuid',$client['external_id'])->first();
+
+            if (empty($patient)) {
+                $patient = new Patient;
+                $patient->uuid = $client['external_id'] ?? '';
+                $patient->first_name = $client['first_name'] ?? '';
+                $patient->last_name = $client['last_name'] ?? '';
+                $patient->middle_name = $client['middle_name'] ?? '';
+                $patient->address = $client['address'] ?? '';
+                $patient->city = $client['city'] ?? '';
+                $patient->state = $client['state'] ?? '';
+                $patient->zipcode = $client['zipcode'] ?? '';
+                $patient->phone = $this->grabClientPhone($clientPhones);
+                $patient->profile_id = $this->profile->id;
+                $patient->agency_id = $this->setOrCreateAgency($client['agency_id'])->id;
+                $patient->save();
+            }
+        }
     }
 
     public function processVisit($item) 
@@ -119,6 +158,26 @@ class Continulink
        foreach($tasks as $taskObj)
        {
             $taskcode = $taskObj['taskcode'] ?? null;
+
+            // check if exist in Questions
+            if(empty($taskcode)){
+                return;
+            }
+
+            $question = Question::where('profile_id',$this->profile->id)->where('uuid',$taskcode['code'])->first();
+
+            if (empty($question)) {
+                $question = new Question;
+                $question->uuid = $taskcode['code'];
+                $question->name = $taskcode['name'];
+                $question->question = $taskcode['description'];
+                $question->agency_id = $this->setOrCreateAgency($taskcode['agency_id'])->id;
+                $question->profile_id = $this->profile->id;
+                $question->type = 'MCQ';
+                $question->choices = json_encode([]);
+                $question->hash = md5($taskcode['description']);
+                $question->save();
+            }
        }
     }
 }
