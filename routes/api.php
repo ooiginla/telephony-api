@@ -4,6 +4,7 @@ use App\Http\Controllers\AgencyController;
 use App\Http\Controllers\PatientsController;
 use App\Http\Controllers\QuestionsController;
 use App\Http\Controllers\AnswerController;
+use App\Http\Controllers\QuestionSetController;
 use App\Http\Controllers\VisitController;
 use App\Http\Middleware\AuthMiddleware;
 use Illuminate\Http\Request;
@@ -21,6 +22,7 @@ Route::middleware(AuthMiddleware::class)->group(function(){
     Route::apiResource('question', QuestionsController::class);
     Route::apiResource('answers', AnswerController::class);
     Route::apiResource('visits', VisitController::class);
+    Route::apiResource('question-set', QuestionSetController::class);
     Route::put('/visit/{visit}/answer', [AnswerController::class, 'store']);
 
 });

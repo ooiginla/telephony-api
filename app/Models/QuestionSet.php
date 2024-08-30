@@ -10,7 +10,16 @@ class QuestionSet extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['question_id', 'question_type', 'selected_answer', 'question_no', 'uuid','visit_id'];
+    protected $fillable = [  
+    'visit_id',
+    'question_id',
+    'question_type',
+    'question_order',
+    'selected_key',
+    'selected_answer',
+    'answered_date',
+    'profile_id'
+];
     
     public function questions():HasMany
     {
