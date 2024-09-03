@@ -22,7 +22,6 @@ return new class extends Migration
             $table->string('state')->nullable();
             $table->string('phone')->nullable();
             $table->string('zipcode')->nullable();
-            $table->string('phone')->nullable();
             $table->timestamps();
 
             $table->foreignId('agency_id')->constrained();

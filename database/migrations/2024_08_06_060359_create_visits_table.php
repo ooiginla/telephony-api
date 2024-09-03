@@ -17,7 +17,11 @@ return new class extends Migration
             $table->foreignId('agency_id')->constrained();
             $table->foreignId('patient_id')->constrained();
             $table->foreignId('user_id')->constrained();
-            $table->timestampTz('visit_date');
+            $table->timestampTz('visit_start');
+            $table->timestampTz('visit_end');
+            $table->string('visit_type')->nullable();
+            $table->string('schedule_type')->nullable();
+            $table->boolean('status')->nullable();
             $table->boolean('is_complete')->default(false);
             $table->timestamps();
             $table->foreignId("profile_id")->constrained();

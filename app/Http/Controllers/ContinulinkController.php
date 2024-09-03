@@ -17,6 +17,8 @@ class ContinulinkController extends Controller
     {
         $payload = $request->all();
         $response = $continulink->process($payload);
+
+        return response()->json($response);
     }
 
     public function receive(Request $request) 

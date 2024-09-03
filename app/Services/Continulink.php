@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Log;
+
 use App\Models\Agency;
 use App\Models\Profile;
 use App\Models\Patient;
@@ -9,6 +11,7 @@ use App\Models\Question;
 use App\Models\QuestionSet;
 use App\Models\Visit;
 use App\Models\User;
+use App\Models\Careplan;
 
 class Continulink
 {
@@ -25,14 +28,22 @@ class Continulink
 
     public function process($payload)
     {
-        foreach($payload as $item) {
-            $this->processEmployee($item);
-            $this->processClient($item);
-            $this->processVisit($item);
-            $this->processTasks($item);
-        }
+        try{
+            foreach($payload as $item) {
+                $this->processEmployee($item);            
+                $this->processClient($item);
+                $this->processTasks($item);
+                $this->processVisit($item);
+            }
 
-        // dd('done');
+            return ['status' => true, 'message' => 'successful'];
+
+        }catch(\Exception $e){
+            $message = "Continulink: Error Occured". $e->getMessage();
+            Log::error($message);
+
+            return ['status' => false, 'message' => $message];
+        }
     }
 
     public function setOrCreateAgency($agency_id, $agency_name="")
@@ -47,7 +58,7 @@ class Continulink
             $agency->save();
         }
 
-        return $agency;
+        return $agency->id;
     }
 
     public function grabClientPhone($clientPhones)
@@ -64,6 +75,11 @@ class Continulink
         }
 
         return $phone;
+    }
+
+    public function getEmployeeSpecialties($specialties)
+    {
+        return implode(",", ($pecialties['empSpecialties'] ?? []));
     }
 
     public function processEmployee($item) 
@@ -96,9 +112,9 @@ class Continulink
                 $user->phone = $employee['phone'] ?? '';
                 $user->pin = $employee['access_code'] ?? '';
                 $user->status = $employee['active'] ?? false;
-
+                $user->specialties = $this->getEmployeeSpecialties($empSpecialty);
                 $user->profile_id = $this->profile->id;
-                $user->agency_id = $this->setOrCreateAgency($employee['agency_id'])->id;
+                $user->agency_id = $this->setOrCreateAgency($employee['agency_id']);
                 $user->save();   
             }
        }
@@ -135,19 +151,93 @@ class Continulink
                 $patient->zipcode = $client['zipcode'] ?? '';
                 $patient->phone = $this->grabClientPhone($clientPhones);
                 $patient->profile_id = $this->profile->id;
-                $patient->agency_id = $this->setOrCreateAgency($client['agency_id'])->id;
+                $patient->agency_id = $this->setOrCreateAgency($client['agency_id']);
                 $patient->save();
             }
         }
     }
 
+    public function setOrCreateModel($model, $agency_id, $uuid_value)
+    {
+        $object = $model->where('uuid', $uuid_value)->where('profile_id', $this->profile->id)->first();
+
+        if(empty($object)) {
+            $object->uuid = $uuid_value;
+            $object->agency_id = $agency_id;
+            $object->profile_id = $this->profile->id;
+            $object->save();
+        }
+
+        return $object->id;
+    }
+
+    public function convertVisitDate($date)
+    {
+        // sample - "4/29/2019 1:00:00 PM
+        $pattern = "/[-\s:\/]/";
+        $comp = preg_split($pattern, $date);
+
+        if($comp[6] == "PM"){
+            $comp[3] = $comp[3] + 12;
+        }
+        
+        $timestamp = mktime($comp[3], $comp[4], $comp[5], $comp[0], $comp[1], $comp[2]);
+
+        return date("Y-m-d H:i:s", $timestamp);
+    }
+
     public function processVisit($item) 
     {
        $visits =  $item['ScheduleService'] ?? null;
+       $careplans =  $item['CarePlan'] ?? null;
        
+       // create schedule
        foreach($visits as $visitObj)
        {
             $schedule = $visitObj['schedule'] ?? null;
+
+            if(empty($schedule)){
+                return;
+            }
+
+            $visit = Visit::where('profile_id',$this->profile->id)->where('uuid',$schedule['id'])->first();
+
+            if (empty($visit)) {
+                $visit = new Visit;
+            }
+
+            $visit->agency_id = $this->setOrCreateAgency($schedule['agency_id']);
+            $visit->uuid = $schedule['id'] ?? '';
+            $visit->patient_id = $this->setOrCreateModel(new Patient, $visit->agency_id, $schedule['external_id']);
+            $visit->user_id = $this->setOrCreateModel(new User, $visit->agency_id, $schedule['employee_id']);
+            $visit->visit_start = $this->convertVisitDate($schedule['start']) ?? null;
+            $visit->visit_end = $this->convertVisitDate($schedule['end']) ?? null;
+            $visit->visit_type = $schedule['type'] ?? '';
+            $visit->schedule_type = $schedule['schedule_type'] ?? '';
+            $visit->status = (boolean) $schedule['active'] ?? false;
+            $visit->profile_id = $this->profile->id;
+            $visit->save();
+       }
+
+       // create questionset
+
+       foreach($careplans as $careplanObj)
+       {
+            $agency_id = $this->setOrCreateAgency($careplanObj['agency_id']);
+            $patient_id = $this->setOrCreateModel(new Patient, $agency_id, $careplanObj['external_id']);
+
+            if(isset($careplanObj['codes']) && !empty($careplanObj['codes'])) 
+            {
+                foreach($careplanObj['codes'] as $entry) {
+                    $question = Question::where('uuid', $entry['code'])->first();
+
+                    $careplan = new Careplan;
+                    $careplan->agency_id = $agency_id;
+                    $careplan->patient_id = $patient_id;
+                    $careplan->question_id = ($question) ? $question->id : null;
+                    $careplan->save();
+                }
+            }
        }
     }
 
@@ -171,10 +261,10 @@ class Continulink
                 $question->uuid = $taskcode['code'];
                 $question->name = $taskcode['name'];
                 $question->question = $taskcode['description'];
-                $question->agency_id = $this->setOrCreateAgency($taskcode['agency_id'])->id;
+                $question->agency_id = $this->setOrCreateAgency($taskcode['agency_id']);
                 $question->profile_id = $this->profile->id;
                 $question->type = 'MCQ';
-                $question->choices = json_encode([]);
+                $question->choices = json_encode(["1"=> "yes", "2" => "no"]);
                 $question->hash = md5($taskcode['description']);
                 $question->save();
             }

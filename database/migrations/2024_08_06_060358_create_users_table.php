@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('name')->nullable();
             $table->string('pin')->nullable();
+            $table->string('specialties')->nullable();
             $table->boolean('status')->default(1);
             $table->timestamps();
             $table->uuid('uuid');
