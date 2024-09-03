@@ -24,6 +24,14 @@ class Continulink
     public function __construct(Profile $profile)
     {
         $this->profile = $profile->retrieve('continulink');
+
+        $this->processed = [
+            'Employees' => [],
+            'Clients' => [],
+            'Tasks' => [],
+            'Schedules' => [],
+            'Careplans' => []
+        ];
     }
 
     public function process($payload)
@@ -36,13 +44,14 @@ class Continulink
                 $this->processVisit($item);
             }
 
-            return ['status' => true, 'message' => 'successful'];
+            return ['status' => true, 'message' => 'successful', 'data' => $this->processed];
 
         }catch(\Exception $e){
             $message = "Continulink: Error Occured". $e->getMessage();
             Log::error($message);
+            dd($e);
 
-            return ['status' => false, 'message' => $message];
+            return ['status' => false, 'message' => $message, 'data' => $this->processed];
         }
     }
 
@@ -117,6 +126,8 @@ class Continulink
                 $user->agency_id = $this->setOrCreateAgency($employee['agency_id']);
                 $user->save();   
             }
+
+            array_push($this->processed['Employees'], $employee['external_id']);
        }
     }
 
@@ -154,6 +165,8 @@ class Continulink
                 $patient->agency_id = $this->setOrCreateAgency($client['agency_id']);
                 $patient->save();
             }
+
+            array_push($this->processed['Clients'], $client['external_id']);
         }
     }
 
@@ -217,6 +230,8 @@ class Continulink
             $visit->status = (boolean) $schedule['active'] ?? false;
             $visit->profile_id = $this->profile->id;
             $visit->save();
+
+            array_push($this->processed['Schedules'], $schedule['id']);    
        }
 
        // create questionset
@@ -232,12 +247,15 @@ class Continulink
                     $question = Question::where('uuid', $entry['code'])->first();
 
                     $careplan = new Careplan;
+                    $careplan->uuid = $careplanObj['id'];
                     $careplan->agency_id = $agency_id;
                     $careplan->patient_id = $patient_id;
                     $careplan->question_id = ($question) ? $question->id : null;
-                    $careplan->save();
+                    $careplan->save();    
                 }
             }
+
+            array_push($this->processed['Careplans'], $careplanObj['id']);
        }
     }
 
@@ -268,6 +286,8 @@ class Continulink
                 $question->hash = md5($taskcode['description']);
                 $question->save();
             }
+
+            array_push($this->processed['Tasks'], $taskcode['code']);
        }
     }
 }
