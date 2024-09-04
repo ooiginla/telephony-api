@@ -330,4 +330,61 @@ class Continulink
             $counter++;
         }
     }
+
+    public function retrieve($agency)
+    {
+        $visits = Visit::with('questionset.question','patient','user','agency','profile')
+                    ->whereDate('created_at', Carbon::today())
+                    ->where('agency_id', $agency->id)
+                    ->get();
+
+        $transformed = [];
+
+        foreach($visits as $visit)
+        {
+            array_push($transformed, [
+                'visit_id' => $visit->id,
+                'schedule_id' => $visit->uuid,
+                'agency_id' => $visit->agency->uuid,
+                'client_id' => $visit->patient->uuid,
+                'employee_id' => $visit->user->uuid,
+                'profile'=> $visit->profile->auth_user,
+                "visit_start" => $visit->visit_start,
+                "visit_end" => $visit->visit_end,
+                "visit_type" => $visit->visit_type,
+                "schedule_type" => $visit->schedule_type,
+                "status" => ($visit->schedule_type) ? 'active':'inactive',
+                "is_complete" => ($visit->is_complete) ? 'completed':'pending',
+                "created_at" => $visit->created_at,
+                "updated_at" => $visit->updated_at,
+                'question_set' => $this->transformQuestionSet($visit->questionset)
+            ]);
+           
+        }
+        return $transformed;
+    }
+
+    public function transformQuestionSet($questionset)
+    {
+        $data = [];
+        $answers = [1 => 'yes', 2 => 'no'];
+
+        foreach($questionset as $entry)
+        {
+            array_push($data, [
+                "id" => $entry->id,
+                "code" => $entry->question->uuid,
+                "question" => $entry->question->name,
+                "question_type" => $entry->question_type,
+                "question_no" => (int) $entry->question_no,
+                "selected_key" => (int) $entry->selected_key,
+                "selected_answer" => $answers[$entry->selected_key] ?? 'Unknown',
+                "answered_date" => $entry->answered_date,
+                "created_at" => $entry->created_at,
+                "updated_at" => $entry->updated_at,
+            ]);
+        }
+
+        return $data;
+    }
 }

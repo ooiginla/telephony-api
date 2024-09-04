@@ -12,8 +12,8 @@ class QuestionSet extends Model
 
     protected $fillable = ['question_id', 'question_type', 'selected_answer', 'question_no', 'uuid','visit_id'];
     
-    public function questions():HasMany
+    public function question()
     {
-        return $this->hasMany(Question::class);
+        return $this->belongsTo(Question::class);
     }
 }

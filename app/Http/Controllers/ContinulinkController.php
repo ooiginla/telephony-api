@@ -21,8 +21,22 @@ class ContinulinkController extends Controller
         return response()->json($response);
     }
 
-    public function receive(Request $request) 
+    public function receive(Request $request, Continulink $continulink) 
     {
-        $payload = $request->all();
+        $request->validate([
+            'agency_id' => 'required'
+        ]);
+
+        $agency_id = $request->input(['agency_id']);
+
+        $agency = Agency::where('uuid', $agency_id)->first();
+
+        if(empty($agency)){
+            return response()->json(['status'=>false,'message'=>'agency not found', 'data' => []]);
+        }
+
+        $response = $continulink->retrieve($agency);
+
+        return response()->json($response);
     }
 }

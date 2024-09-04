@@ -21,4 +21,31 @@ class Visit extends Model
     {
         return $this->belongsToMany(Question::class, 'question_sets');
     }
+
+    public function questionset()
+    {
+        return $this->hasMany(QuestionSet::class);
+    }
+
+    public function agency()
+    {
+        return $this->belongsTo(Agency::class);
+    }
+
+    public function patient()
+    {
+        return $this->belongsTo(Patient::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function profile()
+    {
+        return $this->belongsTo(Profile::class);
+    }
+
+
 }
