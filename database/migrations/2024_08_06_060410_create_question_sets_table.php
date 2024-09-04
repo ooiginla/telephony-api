@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('question_sets', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->nullable();
-            $table->foreignId('visit_id')->constrained();
-            $table->foreignId('question_id')->constrained();
+            $table->foreignId('visit_id');
+            $table->foreignId('question_id');
             $table->string('question_type');
             $table->string('question_no');
             $table->string("selected_key")->nullable();

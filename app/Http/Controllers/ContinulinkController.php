@@ -24,6 +24,5 @@ class ContinulinkController extends Controller
     public function receive(Request $request) 
     {
         $payload = $request->all();
-        dd($payload);
     }
 }

@@ -12,6 +12,7 @@ use App\Models\QuestionSet;
 use App\Models\Visit;
 use App\Models\User;
 use App\Models\Careplan;
+use Carbon\Carbon;
 
 class Continulink
 {
@@ -37,19 +38,21 @@ class Continulink
     public function process($payload)
     {
         try{
-            foreach($payload as $item) {
+            foreach($payload as $item) 
+            {
                 $this->processEmployee($item);            
                 $this->processClient($item);
                 $this->processTasks($item);
+                $this->processCareplan($item);
                 $this->processVisit($item);
             }
 
             return ['status' => true, 'message' => 'successful', 'data' => $this->processed];
 
         }catch(\Exception $e){
+            dd($e);
             $message = "Continulink: Error Occured". $e->getMessage();
             Log::error($message);
-            dd($e);
 
             return ['status' => false, 'message' => $message, 'data' => $this->processed];
         }
@@ -202,12 +205,13 @@ class Continulink
     public function processVisit($item) 
     {
        $visits =  $item['ScheduleService'] ?? null;
-       $careplans =  $item['CarePlan'] ?? null;
+       $visit = null;
        
        // create schedule
        foreach($visits as $visitObj)
        {
             $schedule = $visitObj['schedule'] ?? null;
+            $question_set = [];
 
             if(empty($schedule)){
                 return;
@@ -231,19 +235,25 @@ class Continulink
             $visit->profile_id = $this->profile->id;
             $visit->save();
 
-            array_push($this->processed['Schedules'], $schedule['id']);    
+            array_push($this->processed['Schedules'], $schedule['id']); 
+            
+            $this->loadQuestionSet($visit);
        }
-
-       // create questionset
+    }
+    
+    public function processCareplan($item) 
+    {
+        $careplans =  $item['CarePlan'] ?? null;
 
        foreach($careplans as $careplanObj)
        {
             $agency_id = $this->setOrCreateAgency($careplanObj['agency_id']);
             $patient_id = $this->setOrCreateModel(new Patient, $agency_id, $careplanObj['external_id']);
-
+            
             if(isset($careplanObj['codes']) && !empty($careplanObj['codes'])) 
             {
-                foreach($careplanObj['codes'] as $entry) {
+                foreach($careplanObj['codes'] as $entry) 
+                {
                     $question = Question::where('uuid', $entry['code'])->first();
 
                     $careplan = new Careplan;
@@ -256,7 +266,7 @@ class Continulink
             }
 
             array_push($this->processed['Careplans'], $careplanObj['id']);
-       }
+        }
     }
 
     public function processTasks($item) 
@@ -289,5 +299,35 @@ class Continulink
 
             array_push($this->processed['Tasks'], $taskcode['code']);
        }
+    }
+
+    public function loadQuestionSet($visit)
+    {
+        $todays_questions = Careplan::where('patient_id', $visit->patient_id)->whereDate('created_at', Carbon::today())->get();
+
+        $counter = 1;
+        $loaded_questions = [];
+
+        foreach($todays_questions as $question_entry)
+        {
+            if(in_array($question_entry->question_id, $loaded_questions)){
+                continue;
+            }
+
+            $question_set = QuestionSet::where('visit_id', $visit->id)->where('question_id', $question_entry->question_id)->first();
+
+            if(empty($question_set)) {
+                $question_set = new QuestionSet;
+                $question_set->visit_id = $visit->id;
+                $question_set->question_id = $question_entry->question_id;
+                $question_set->question_type = 'MCQ';
+                $question_set->question_no = $counter;
+                $question_set->save();
+            }
+            
+            array_push($loaded_questions, $question_entry->question_id);
+
+            $counter++;
+        }
     }
 }
