@@ -12,6 +12,8 @@ class Visit extends Model
     use HasFactory;
     use HasUuids;
 
+    protected $fillable = ['visit_start','visit_end'];
+
     public function uniqueIds(): array
     {
         return ['uuid'];

@@ -357,14 +357,13 @@ class Continulink
                 "is_complete" => ($visit->is_complete) ? 'completed':'pending',
                 "created_at" => $visit->created_at,
                 "updated_at" => $visit->updated_at,
-                'question_set' => $this->transformQuestionSet($visit->questionset)
+                'question_set' => $this->transformQuestionSet($visit->questionset, $visit->uuid)
             ]);
-           
         }
-        return $transformed;
+        return ["Visits" => $transformed];
     }
 
-    public function transformQuestionSet($questionset)
+    public function transformQuestionSet($questionset, $schedule_id)
     {
         $data = [];
         $answers = [1 => 'yes', 2 => 'no'];
@@ -373,6 +372,7 @@ class Continulink
         {
             array_push($data, [
                 "id" => $entry->id,
+                "schedule_id" => $schedule_id,
                 "code" => $entry->question->uuid,
                 "question" => $entry->question->name,
                 "question_type" => $entry->question_type,

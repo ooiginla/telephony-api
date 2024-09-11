@@ -9,10 +9,73 @@ use App\Models\Patient;
 use App\Models\Visit;
 use App\Models\Question;
 use App\Models\QuestionSet;
-
+use Carbon\Carbon;
 
 class VisitController extends Controller
 {
+
+    public function startVisit(Request $request)
+    {
+        $request->validate([
+            'visit_id' => ['required']
+        ]);
+
+        $visit_id = $request->input('visit_id');
+        $profile = $request->input('profile');
+
+        $visit = Visit::where('id', $visit_id)->orWhere('uuid', $visit_id)
+                ->where('profile_id', $profile->id)->first();
+
+        if(empty($visit)){
+            return response()->json([
+                'status' => false,
+                'message' => 'Visit successfully started',
+                'data' => []
+            ], 400);
+        }
+                
+        $visit->visit_start = Carbon::now();
+        $visit->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Visit successfully started',
+            'data' => $visit
+        ]);
+
+    }
+
+    public function endVisit(Request $request)
+    {
+        $request->validate([
+            'visit_id' => ['required']
+        ]);
+
+        $visit_id = $request->input('visit_id');
+        $profile = $request->input('profile');
+
+        $visit = Visit::where('id', $visit_id)->orWhere('uuid', $visit_id)
+                ->where('profile_id', $profile->id)->first();
+
+        if(empty($visit)){
+            return response()->json([
+                'status' => false,
+                'message' => 'Visit successfully started',
+                'data' => []
+            ], 400);
+        }
+
+        $visit->visit_end = Carbon::now();
+        $visit->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Visit successfully ended',
+            'data' => $visit
+        ]);
+    }
+
+
     public function store(Request $request)
     {
         $request->validate([

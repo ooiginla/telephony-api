@@ -17,8 +17,13 @@ class PatientResource extends JsonResource
     {
          
         return  [
+            'id' => $this->patient_id,
+            'uuid' => $this->uuid,
             'agency' => AgencyResource::make($this->whenLoaded('agency')),
-            'phone_number' => $this->phone_number,
+            'phone_number' => $this->phone,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'profile' => $this->profile->auth_user
         ];
     }
 }

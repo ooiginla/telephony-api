@@ -29,4 +29,9 @@ class Patient extends Model
     {
         return $this->belongsTo(Agency::class);
     }
+
+    public function profile():BelongsTo
+    {
+        return $this->belongsTo(Profile::class);
+    }
 }

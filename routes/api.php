@@ -6,6 +6,7 @@ use App\Http\Controllers\QuestionsController;
 use App\Http\Controllers\AnswerController;
 use App\Http\Controllers\VisitController;
 use App\Http\Controllers\ContinulinkController;
+use App\Http\Controllers\UserController;
 use App\Http\Middleware\AuthMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +25,16 @@ Route::middleware(AuthMiddleware::class)->group(function(){
     Route::apiResource('visits', VisitController::class);
     
     Route::put('/visit/{visit}/answer', [AnswerController::class, 'store']);
+
+    // Get Customer API by Phone number
+    Route::get('/fetch/patient/byphone', [PatientsController::class, 'getPatientByPhone']);
+    Route::any('/fetch/caregiver/bycode', [UserController::class, 'getCaregiverByAccessCode']);
+    Route::post('/trigger/visit/start', [VisitController::class, 'startVisit']);
+    Route::post('/trigger/visit/end', [VisitController::class, 'endVisit']);
+/*  
+Get Visits by Customer / Caregiver
+*/
+
 });
 
 Route::get('/ExecuteDNDSend', [ContinulinkController::class, 'send']);

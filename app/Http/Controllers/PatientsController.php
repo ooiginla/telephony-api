@@ -72,4 +72,23 @@ class PatientsController extends Controller
         $patientData = PatientData::fromRequest($request);
         return $this->upsertPatientAction::execute($patient, $patientData);
     } 
+
+    public function getPatientByPhone(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required',
+        ]);
+
+        $profile = $request->input('profile');
+
+        $phone = $request->input('phone');
+
+
+        $patient = Patient::with('agency')
+                        ->where('phone',$phone)
+                        ->where('profile_id',$profile->id)
+                        ->first();
+
+        return PatientResource::make($patient);
+    }
 }
