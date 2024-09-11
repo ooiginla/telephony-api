@@ -351,6 +351,8 @@ class Continulink
                 'profile'=> $visit->profile->auth_user,
                 "visit_start" => $visit->visit_start,
                 "visit_end" => $visit->visit_end,
+                "clock_in" => $visit->clock_in,
+                "clock_out" => $visit->clock_out,
                 "visit_type" => $visit->visit_type,
                 "schedule_type" => $visit->schedule_type,
                 "status" => ($visit->schedule_type) ? 'active':'inactive',

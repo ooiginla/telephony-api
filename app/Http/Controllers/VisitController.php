@@ -34,7 +34,7 @@ class VisitController extends Controller
             ], 400);
         }
                 
-        $visit->visit_start = Carbon::now();
+        $visit->clock_in = Carbon::now();
         $visit->save();
 
         return response()->json([
@@ -65,7 +65,7 @@ class VisitController extends Controller
             ], 400);
         }
 
-        $visit->visit_end = Carbon::now();
+        $visit->clock_out = Carbon::now();
         $visit->save();
 
         return response()->json([

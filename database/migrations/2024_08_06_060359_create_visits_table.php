@@ -19,6 +19,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained();
             $table->timestampTz('visit_start')->nullable();
             $table->timestampTz('visit_end')->nullable();
+            $table->timestampTz('clock_in')->nullable();
+            $table->timestampTz('clock_out')->nullable();
             $table->string('visit_type')->nullable();
             $table->string('schedule_type')->nullable();
             $table->boolean('status')->nullable();
