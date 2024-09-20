@@ -17,24 +17,34 @@ class VisitController extends Controller
     public function startVisit(Request $request)
     {
         $request->validate([
-            'visit_id' => ['required']
+            'visit_id' => 'required',
+            'start_time' => 'required'
         ]);
 
         $visit_id = $request->input('visit_id');
+        $start_time = $request->input('start_time');
         $profile = $request->input('profile');
 
-        $visit = Visit::where('id', $visit_id)->orWhere('uuid', $visit_id)
-                ->where('profile_id', $profile->id)->first();
+        $visit = Visit::where('id', $visit_id)->where('profile_id', $profile->id)->first();
 
         if(empty($visit)){
             return response()->json([
                 'status' => false,
-                'message' => 'Visit successfully started',
+                'message' => 'Visit not found',
                 'data' => []
             ], 400);
         }
+
+         // User has clocked out before?
+         if(!empty($visit->clock_in)) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Visit previously clocked In',
+                'data' => $visit
+            ]);
+        }
                 
-        $visit->clock_in = Carbon::now();
+        $visit->clock_in = date("Y-m-d H:i:s", $start_time);
         $visit->save();
 
         return response()->json([
@@ -45,32 +55,69 @@ class VisitController extends Controller
 
     }
 
+     /**
+     * Display the specified resource.
+     */
+    public function index(Request $request)
+    {
+        $profile = $request->input('profile');
+        $patient_id = $request->input('patient_id');
+        
+        $visit = Visit::where('profile_id', $profile->id)
+                    ->where('is_complete', 0)
+                    ->whereDate('visit_start', Carbon::today());
+
+        if(! empty($patient_id) && is_numeric($patient_id))
+        {
+            $visit = $visit->where('patient_id',$patient_id);
+        }
+
+        $visits = $visit->get();
+        
+        return response([
+            'data' => $visits
+        ]);
+    }
+
+
     public function endVisit(Request $request)
     {
         $request->validate([
-            'visit_id' => ['required']
+            'visit_id' => 'required',
+            'end_time' => 'required'
         ]);
 
         $visit_id = $request->input('visit_id');
+        $end_time = $request->input('end_time');
         $profile = $request->input('profile');
 
-        $visit = Visit::where('id', $visit_id)->orWhere('uuid', $visit_id)
-                ->where('profile_id', $profile->id)->first();
+        $visit = Visit::where('id', $visit_id)->where('profile_id', $profile->id)->first();
 
+        // Cant find visit?
         if(empty($visit)){
             return response()->json([
                 'status' => false,
-                'message' => 'Visit successfully started',
-                'data' => []
+                'message' => 'Visit not found',
+                'data' => null
             ], 400);
         }
 
-        $visit->clock_out = Carbon::now();
+        // User has clocked out before?
+        if(!empty($visit->clock_out)) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Visit previously clocked out',
+                'data' => $visit
+            ]);
+        }
+
+        $visit->clock_out = date("Y-m-d H:i:s", $end_time);
+        $visit->is_complete = true;
         $visit->save();
 
         return response()->json([
             'status' => true,
-            'message' => 'Visit successfully ended',
+            'message' => 'Visit successfully clocked out',
             'data' => $visit
         ]);
     }

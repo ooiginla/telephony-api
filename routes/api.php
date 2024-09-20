@@ -27,14 +27,11 @@ Route::middleware(AuthMiddleware::class)->group(function(){
     Route::put('/visit/{visit}/answer', [AnswerController::class, 'store']);
 
     // Get Customer API by Phone number
-    Route::get('/fetch/patient/byphone', [PatientsController::class, 'getPatientByPhone']);
+    Route::any('/fetch/patient/byphone', [PatientsController::class, 'getPatientByPhone']);
     Route::any('/fetch/caregiver/bycode', [UserController::class, 'getCaregiverByAccessCode']);
-    Route::post('/trigger/visit/start', [VisitController::class, 'startVisit']);
-    Route::post('/trigger/visit/end', [VisitController::class, 'endVisit']);
-/*  
-Get Visits by Customer / Caregiver
-*/
-
+    Route::any('/trigger/visit/start', [VisitController::class, 'startVisit']);
+    Route::any('/trigger/visit/end', [VisitController::class, 'endVisit']);
+    Route::any('/check/employee/exists', [UserController::class, 'checkEmployeeExist']);
 });
 
 Route::get('/ExecuteDNDSend', [ContinulinkController::class, 'send']);

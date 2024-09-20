@@ -25,7 +25,14 @@ class AuthMiddleware
         $authUser = request()->header('auth-user');
         $authKey = request()->header('auth-key');
 
-        $profile = Profile::where('auth_user', $authUser)->first();    
+        /*
+            $profile = Profile::where('auth_user', 'continulink')->first();    
+            $request->merge(['profile' => $profile]);
+            return $next($request);
+        */
+
+        $profile = Profile::where('auth_user', $authUser)->first();
+
         if(empty($profile)){
             return response()->json([
                 'status' => false,
@@ -33,24 +40,20 @@ class AuthMiddleware
                 'data' => null
             ]);
         }
-         
+        
         if($profile->exists())
         {
             if($profile->auth_key ===  $authKey){
                 $request->merge(['profile' => $profile]);
                 return $next($request);
             }else{
-            return response()->json([
-                'status' => false,
-                'message' => 'You are not authenticated',
-                'data' => null
-            ]);
+                return response()->json([
+                    'status' => false,
+                    'message' => 'You are not authenticated',
+                    'data' => null
+                ]);
+            }
         }
-                    
-            
-            
-        }
-        
     }
 
     /**
