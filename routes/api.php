@@ -34,5 +34,5 @@ Route::middleware(AuthMiddleware::class)->group(function(){
     Route::any('/check/employee/exists', [UserController::class, 'checkEmployeeExist']);
 });
 
-Route::get('/ExecuteDNDSend', [ContinulinkController::class, 'send']);
-Route::get('/ExecuteDNDReceive', [ContinulinkController::class, 'receive']);
+Route::any('/ExecuteDNDSend', [ContinulinkController::class, 'send']);
+Route::any('/ExecuteDNDReceive', [ContinulinkController::class, 'receive']);
