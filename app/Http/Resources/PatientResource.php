@@ -17,7 +17,7 @@ class PatientResource extends JsonResource
     {
          
         return  [
-            'id' => $this->patient_id,
+            'id' => $this->id,
             'uuid' => $this->uuid,
             'agency' => AgencyResource::make($this->whenLoaded('agency')),
             'phone_number' => $this->phone,
