@@ -96,7 +96,7 @@ class Continulink
 
     public function processEmployee($item) 
     {
-       $employees =  $item['Worker'] ?? null;
+       $employees =  $item['Worker'] ?? [];
        
        foreach($employees as $employeeObj)
        {
@@ -136,7 +136,7 @@ class Continulink
 
     public function processClient($item) 
     {
-       $clients =  $item['Episode'] ?? null;
+       $clients =  $item['Episode'] ?? [];
        
        foreach($clients as $clientObj)
        {
@@ -204,7 +204,7 @@ class Continulink
 
     public function processVisit($item) 
     {
-       $visits =  $item['ScheduleService'] ?? null;
+       $visits =  $item['ScheduleService'] ?? [];
        $visit = null;
        
        // create schedule
@@ -243,7 +243,7 @@ class Continulink
     
     public function processCareplan($item) 
     {
-        $careplans =  $item['CarePlan'] ?? null;
+        $careplans =  $item['CarePlan'] ?? [];
 
        foreach($careplans as $careplanObj)
        {
@@ -271,7 +271,7 @@ class Continulink
 
     public function processTasks($item) 
     {
-       $tasks =  $item['TaskCode'] ?? null;
+       $tasks =  $item['TaskCode'] ?? [];
        
        foreach($tasks as $taskObj)
        {
