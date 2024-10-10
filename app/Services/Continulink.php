@@ -343,23 +343,23 @@ class Continulink
         foreach($visits as $visit)
         {
             array_push($transformed, [
-                'visit_id' => $visit->id,
-                'schedule_id' => $visit->uuid,
-                'agency_id' => $visit->agency->uuid,
-                'client_id' => $visit->patient->uuid,
-                'employee_id' => $visit->user->uuid,
-                'profile'=> $visit->profile->auth_user,
-                "visit_start" => $visit->visit_start,
-                "visit_end" => $visit->visit_end,
-                "clock_in" => $visit->clock_in,
-                "clock_out" => $visit->clock_out,
-                "visit_type" => $visit->visit_type,
-                "schedule_type" => $visit->schedule_type,
-                "status" => ($visit->schedule_type) ? 'active':'inactive',
-                "is_complete" => ($visit->is_complete) ? 'completed':'pending',
-                "created_at" => $visit->created_at,
-                "updated_at" => $visit->updated_at,
-                'question_set' => $this->transformQuestionSet($visit->questionset, $visit->uuid)
+                'VisitId' => $visit->id,
+                'ScheduleId' => $visit->uuid,
+                'AgencyId' => $visit->agency->uuid,
+                'ClientId' => $visit->patient->uuid,
+                'EmployeeId' => $visit->user->uuid,
+                'Profile'=> $visit->profile->auth_user,
+                "VisitStart" => $visit->visit_start,
+                "VisitEnd" => $visit->visit_end,
+                "ClockIn" => $visit->clock_in,
+                "ClockOut" => $visit->clock_out,
+                "VisitType" => $visit->visit_type,
+                "ScheduleType" => $visit->schedule_type,
+                "Status" => ($visit->schedule_type) ? 'active':'inactive',
+                "IsComplete" => ($visit->is_complete) ? 'completed':'pending',
+                "CreatedAt" => $visit->created_at,
+                "UpdatedAt" => $visit->updated_at,
+                'QuestionSet' => $this->transformQuestionSet($visit->questionset, $visit->uuid)
             ]);
         }
         return ["Visits" => $transformed];
