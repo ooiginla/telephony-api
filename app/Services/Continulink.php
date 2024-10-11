@@ -225,6 +225,7 @@ class Continulink
 
             $visit->agency_id = $this->setOrCreateAgency($schedule['agency_id']);
             $visit->uuid = $schedule['id'] ?? '';
+            $visit->episode_id = $schedule['episode_id'] ?? '';
             $visit->patient_id = $this->setOrCreateModel(new Patient, $visit->agency_id, $schedule['external_id']);
             $visit->user_id = $this->setOrCreateModel(new User, $visit->agency_id, $schedule['employee_id']);
             $visit->visit_start = $this->convertVisitDate($schedule['start']) ?? null;
@@ -348,6 +349,7 @@ class Continulink
                 'AgencyId' => $visit->agency->uuid,
                 'ClientId' => $visit->patient->uuid,
                 'EmployeeId' => $visit->user->uuid,
+                'EpisodeId' => $visit->episode_id,
                 'Profile'=> $visit->profile->auth_user,
                 "VisitStart" => $visit->visit_start,
                 "VisitEnd" => $visit->visit_end,
