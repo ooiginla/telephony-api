@@ -34,5 +34,8 @@ Route::middleware(AuthMiddleware::class)->group(function(){
     Route::any('/check/employee/exists', [UserController::class, 'checkEmployeeExist']);
 });
 
+Route::any("/generate-sound",[QuestionsController::class,'getPendingSound']);
+Route::any("/update-sound",[QuestionsController::class,'postSoundGenerated']);
+
 Route::any('/ExecuteDNDSend', [ContinulinkController::class, 'send']);
 Route::any('/ExecuteDNDReceive', [ContinulinkController::class, 'receive']);

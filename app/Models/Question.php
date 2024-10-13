@@ -15,7 +15,7 @@ class Question extends Model
     use HasFactory;
     use HasUuids;
 
-    protected $fillable = ['question', 'type', 'choices', 'agency_id','hash'];
+    protected $fillable = ['question', 'type', 'choices', 'agency_id','hash','has_sound'];
 
     public function uniqueIds(): array
     {

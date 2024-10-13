@@ -19,6 +19,34 @@ class QuestionsController extends Controller
     {
         
     }
+
+    public function getPendingSound(Request $request)
+    {
+       $questions =  Question::select('id','name','question')->where('has_sound', false)->get();
+
+       return response()->json([
+            'data' => $questions
+       ]);
+    }
+
+    public function postSoundGenerated(Request $request)
+    {
+       $task_id = $request->input('id');
+       $name = $request->input("name");
+
+       $status = Question::where('id', $task_id)->update(['has_sound' => true]);
+
+       if($status){
+            $msg = "Sound successfully pushed for id: ". $task_id . " - ". $name;
+       }else{
+        $msg = "Error updating sound updated event for question id: ". $task_id;
+       }
+
+       return response()->json([
+            "message" => $msg
+       ]);
+    }
+
     /**
      * Display a listing of the resource.
      */
