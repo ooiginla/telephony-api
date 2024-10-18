@@ -16,6 +16,8 @@ class VisitController extends Controller
 
     public function startVisit(Request $request)
     {
+        config(['app.timezone' => 'America/Chicago']);
+
         $request->validate([
             'visit_id' => 'required',
             'start_time' => 'required'
@@ -44,7 +46,7 @@ class VisitController extends Controller
             ]);
         }
                 
-        $visit->clock_in = date("Y-m-d H:i:s", $start_time);
+        $visit->clock_in = $start_time;
         $visit->save();
 
         return response()->json([
@@ -111,7 +113,7 @@ class VisitController extends Controller
             ]);
         }
 
-        $visit->clock_out = date("Y-m-d H:i:s", $end_time);
+        $visit->clock_out = $end_time;
         $visit->is_complete = true;
         $visit->save();
 
