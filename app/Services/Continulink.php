@@ -178,6 +178,7 @@ class Continulink
         $object = $model->where('uuid', $uuid_value)->where('profile_id', $this->profile->id)->first();
 
         if(empty($object)) {
+            $object = $model;
             $object->uuid = $uuid_value;
             $object->agency_id = $agency_id;
             $object->profile_id = $this->profile->id;
