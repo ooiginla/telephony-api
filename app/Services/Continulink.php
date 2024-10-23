@@ -344,6 +344,15 @@ class Continulink
 
         foreach($visits as $visit)
         {
+            if(!empty($visit->clock_out)){
+                $statusVal = 2;   
+            }elseif(!empty($visit->clock_in)){
+                $statusVal = 1;
+            }else{
+                $statusVal = 0;
+            };
+
+            
             array_push($transformed, [
                 'VisitId' => $visit->id,
                 'ScheduleId' => $visit->uuid,
@@ -358,7 +367,7 @@ class Continulink
                 "ClockOut" => $visit->clock_out,
                 "VisitType" => $visit->visit_type,
                 "ScheduleType" => $visit->schedule_type,
-                "Status" => ($visit->schedule_type) ? 'active':'inactive',
+                "Status" => (int) $statusVal,
                 "IsComplete" => ($visit->is_complete) ? 'completed':'pending',
                 "CreatedAt" => $visit->created_at,
                 "UpdatedAt" => $visit->updated_at,
