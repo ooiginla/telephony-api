@@ -341,37 +341,74 @@ class Continulink
                     ->get();
 
         $transformed = [];
+        $calls = [];
 
         foreach($visits as $visit)
         {
-            if(!empty($visit->clock_out)){
-                $statusVal = 2;   
-            }elseif(!empty($visit->clock_in)){
+            // Clocked In and Out?
+            if(!empty($visit->clock_out))
+            {
+                $statusVal = 2;  
+                
+                array_push($calls, [
+                    "VisitID" => $visit->uuid,
+                    "call_type_name" => "Start",
+                    "Phone" => $visit->patient->phone
+                ]);
+
+                array_push($calls, [
+                    "VisitID" => $visit->uuid,
+                    "call_type_name" => "End",
+                    "Phone" => $visit->patient->phone
+                ]);
+
+            }elseif(!empty($visit->clock_in))
+            {
+                // Clocked In, Not out yet
                 $statusVal = 1;
+
+                array_push($calls, [
+                    "VisitID" => $visit->uuid,
+                    "CallTypeName" => "Start",
+                    "Phone" => $visit->patient->phone
+                ]);
             }else{
+                // Not clocked in
                 $statusVal = 0;
             };
 
             
             array_push($transformed, [
-                'VisitId' => $visit->id,
-                'ScheduleId' => $visit->uuid,
-                'AgencyId' => $visit->agency->uuid,
-                'ClientId' => $visit->patient->uuid,
-                'EmployeeId' => $visit->user->uuid,
-                'EpisodeId' => $visit->episode_id,
-                'Profile'=> $visit->profile->auth_user,
+                "VisitId" => $visit->id,
+                "ScheduleId" => $visit->uuid,
                 "VisitStart" => $visit->visit_start,
                 "VisitEnd" => $visit->visit_end,
-                "ClockIn" => $visit->clock_in,
-                "ClockOut" => $visit->clock_out,
-                "VisitType" => $visit->visit_type,
-                "ScheduleType" => $visit->schedule_type,
-                "Status" => (int) $statusVal,
-                "IsComplete" => ($visit->is_complete) ? 'completed':'pending',
-                "CreatedAt" => $visit->created_at,
-                "UpdatedAt" => $visit->updated_at,
-                'QuestionSet' => $this->transformQuestionSet($visit->questionset, $visit->uuid)
+                "MileageQty" => 0,
+                "TravelEndDateTime" => "",
+                "TravelTimeInMinutes" => 0,
+                "OdometerStart" => 0,
+                "OdometerEnd" => 0,
+                "OdometerCalc" => 0,
+                "PersonnelSys" => $visit->user->uuid,
+                "EpisodeSys" => $visit->episode_id,
+                "ResidentSys" => $visit->patient->uuid,
+                "AgencyId" => $visit->agency->uuid,
+                "VType" => $visit->visit_type,
+                "Discipline" => "",
+                "VisitStatus" => (int) $statusVal,
+                "coordinates" => (object) [],
+                "Mobile" => 0,
+                "UTCStart" => $visit->clock_in,
+                "UTCEnd" => $visit->clock_out,
+                "Documentation" => (object)[],
+                "Calls" => $calls
+                // 'Profile'=> $visit->profile->auth_user,         
+                // "VisitType" => $visit->visit_type,
+                // "ScheduleType" => $visit->schedule_type,
+                // "IsComplete" => ($visit->is_complete) ? 'completed':'pending',
+                // "CreatedAt" => $visit->created_at,
+                // "UpdatedAt" => $visit->updated_at,
+                // 'QuestionSet' => $this->transformQuestionSet($visit->questionset, $visit->uuid)
             ]);
         }
         return ["Visits" => $transformed];
