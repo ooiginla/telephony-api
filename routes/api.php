@@ -31,6 +31,9 @@ Route::middleware(AuthMiddleware::class)->group(function(){
     Route::any('/fetch/patient/byphone', [PatientsController::class, 'getPatientByPhone']);
     Route::any('/fetch/caregiver/bycode', [UserController::class, 'getCaregiverByAccessCode']);
     Route::any('/fetch/visit/tasks', [QuestionSetController::class, 'getVisitTasks']);
+    Route::any('/post/visit/tasks', [QuestionSetController::class, 'postVisitTasks']);
+
+    
     Route::any('/trigger/visit/start', [VisitController::class, 'startVisit']);
     Route::any('/trigger/visit/end', [VisitController::class, 'endVisit']);
     Route::any('/check/employee/exists', [UserController::class, 'checkEmployeeExist']);

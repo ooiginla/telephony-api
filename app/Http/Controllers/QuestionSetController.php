@@ -22,5 +22,36 @@ class QuestionSetController extends Controller
             'data' => $tasks
         ]);
     }
+
+    public function postVisitTasks(Request $request)
+    {
+        $options = [
+            1 => "yes",
+            2 => "no",
+            3 => "refused"
+        ];
+
+
+        $set_id = $request->input('set_id');
+        $option = $request->input('option');
+
+        $task = QuestionSet::find($set_id);
+
+        if(empty($task)){
+            return  response(['data' => []]);
+        }
+
+        $task->selected_key = $option;
+        $task->selected_answer = $options[$option];
+        $task->answered_date = date("Y-m-d H:i:s");
+        $task->save();
+
+        return response([
+                'status' => true, 
+                'data' => ['message' => "option for task id:".$set_id ." saved"]
+        ]);
+    }
+
+
     
 }
