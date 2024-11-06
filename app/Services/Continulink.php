@@ -256,7 +256,9 @@ class Continulink
             {
                 foreach($careplanObj['codes'] as $entry) 
                 {
-                    $question = Question::where('uuid', $entry['code'])->first();
+                    $question = Question::where('uuid', $entry['code'])
+                                    ->where('agency_id', $agency_id)
+                                    ->first();
 
                     $careplan = new Careplan;
                     $careplan->uuid = $careplanObj['id'];
@@ -284,18 +286,20 @@ class Continulink
                 return;
             }
 
-            $question = Question::where('profile_id',$this->profile->id)->where('uuid',$taskcode['code'])->first();
+            $question = Question::where('profile_id',$this->profile->id)->where('uuid',$taskcode['id'])->first();
 
             if (empty($question)) {
                 $question = new Question;
-                $question->uuid = $taskcode['code'];
+                $question->uuid = $taskcode['id'];
+                $question->code = $taskcode['code'];
                 $question->name = $taskcode['name'];
-                $question->question = $taskcode['description'];
+                $question->question = $taskcode['name'];
                 $question->agency_id = $this->setOrCreateAgency($taskcode['agency_id']);
                 $question->profile_id = $this->profile->id;
-                $question->type = 'MCQ';
-                $question->choices = json_encode(["1"=> "yes", "2" => "no"]);
-                $question->hash = md5($taskcode['description']);
+                $question->type = $taskcode['visit_type'];
+                $question->choices = json_encode(["1"=> "yes", "2" => "no", "3" => "refused"]);
+                $question->hash = md5($taskcode['name']);
+                $question->has_sound = 0;
                 $question->save();
             }
 

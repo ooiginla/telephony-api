@@ -20,6 +20,13 @@ class QuestionsController extends Controller
         
     }
 
+    public function getVisitTasks(Request $request)
+    {
+        $visit_id = $request->input('visit_id');
+
+        
+    }
+
     public function getPendingSound(Request $request)
     {
        $questions =  Question::select('id','name','question')->where('has_sound', false)->get();

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AgencyController;
 use App\Http\Controllers\PatientsController;
 use App\Http\Controllers\QuestionsController;
+use App\Http\Controllers\QuestionSetController;
 use App\Http\Controllers\AnswerController;
 use App\Http\Controllers\VisitController;
 use App\Http\Controllers\ContinulinkController;
@@ -29,6 +30,7 @@ Route::middleware(AuthMiddleware::class)->group(function(){
     // Get Customer API by Phone number
     Route::any('/fetch/patient/byphone', [PatientsController::class, 'getPatientByPhone']);
     Route::any('/fetch/caregiver/bycode', [UserController::class, 'getCaregiverByAccessCode']);
+    Route::any('/fetch/visit/tasks', [QuestionSetController::class, 'getVisitTasks']);
     Route::any('/trigger/visit/start', [VisitController::class, 'startVisit']);
     Route::any('/trigger/visit/end', [VisitController::class, 'endVisit']);
     Route::any('/check/employee/exists', [UserController::class, 'checkEmployeeExist']);
