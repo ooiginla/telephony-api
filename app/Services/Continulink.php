@@ -404,7 +404,7 @@ class Continulink
                 "Mobile" => 0,
                 "UTCStart" => $visit->clock_in,
                 "UTCEnd" => $visit->clock_out,
-                "Documentation" => (object)[],
+                "Documentation" => $this->transformQuestionSet($visit->questionset, $visit->uuid),
                 "Calls" => $calls
                 // 'Profile'=> $visit->profile->auth_user,         
                 // "VisitType" => $visit->visit_type,
@@ -412,7 +412,7 @@ class Continulink
                 // "IsComplete" => ($visit->is_complete) ? 'completed':'pending',
                 // "CreatedAt" => $visit->created_at,
                 // "UpdatedAt" => $visit->updated_at,
-                // 'QuestionSet' => $this->transformQuestionSet($visit->questionset, $visit->uuid)
+                // 'QuestionSet' => $this->transformQuestionSet($visit->questionset, $visit->uuid, )
             ]);
         }
         return ["Visits" => $transformed];
@@ -426,6 +426,15 @@ class Continulink
         foreach($questionset as $entry)
         {
             array_push($data, [
+                "VisitID" => $schedule_id,
+                "DocID" => $entry->question->code,
+                "Value" => base64_encode((string) $entry->selected_key),
+                "ValueLength" => 1,
+                "Type" => "Task",
+                "Reason" => $entry->reason
+            ]);
+
+            /*array_push($data, [
                 "id" => $entry->id,
                 "schedule_id" => $schedule_id,
                 "code" => $entry->question->uuid,
@@ -438,6 +447,7 @@ class Continulink
                 "created_at" => $entry->created_at,
                 "updated_at" => $entry->updated_at,
             ]);
+            */
         }
 
         return $data;
