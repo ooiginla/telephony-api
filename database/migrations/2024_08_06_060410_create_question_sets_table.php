@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('question_no');
             $table->string("selected_key")->nullable();
             $table->string("selected_answer")->nullable();
+            $table->string("reason")->nullable();
             $table->timestampTz("answered_date")->nullable();
             $table->timestamps();
         });
@@ -30,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('visit_questions');
+        Schema::dropIfExists('question_sets');
     }
 };

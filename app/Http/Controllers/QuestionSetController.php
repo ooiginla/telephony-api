@@ -52,6 +52,28 @@ class QuestionSetController extends Controller
         ]);
     }
 
+    public function postRefusalReason(Request $request)
+    {
+        $set_id = $request->input('set_id');
+        $refusal_reason_code = $request->input('option');
+
+        $task = QuestionSet::find($set_id);
+
+        if(empty($task)){
+            return  response(['data' => []]);
+        }
+
+        $task->reason = $refusal_reason_code;
+        $task->save();
+
+        return response([
+                'status' => true, 
+                'data' => ['message' => "Refusal reason for task id:".$set_id ." saved"]
+        ]);
+    }
+
+    
+
 
     
 }
