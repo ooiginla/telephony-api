@@ -24,12 +24,12 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->string('pin')->nullable();
             $table->string('specialties')->nullable();
+            $table->string("timezone")->nullable();
             $table->boolean('status')->default(1);
             $table->timestamps();
             $table->uuid('uuid');
-            
             $table->foreignId("profile_id")->constrained();
-            $table->foreignId('agency_id')->constrained();
+            $table->foreignId('agency_id')->constrained(); 
         });
     }
 

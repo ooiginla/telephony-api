@@ -50,7 +50,6 @@ class Continulink
             return ['status' => true, 'message' => 'successful', 'data' => $this->processed];
 
         }catch(\Exception $e){
-            dd($e);
             $message = "Continulink: Error Occured". $e->getMessage();
             Log::error($message);
 
@@ -113,22 +112,24 @@ class Continulink
 
             if (empty($user)) {
                 $user = new User;
-                $user->uuid = $employee['external_id'];
-                $user->first_name = $employee['first_name'] ?? '';
-                $user->last_name = $employee['last_name'] ?? '';
-                $user->middle_name = $employee['middle_name'] ?? '';
-                $user->address = $employee['address'] ?? '';
-                $user->city = $employee['city'] ?? '';
-                $user->state = $employee['state'] ?? '';
-                $user->zipcode = $employee['zipcode'] ?? '';
-                $user->phone = $employee['phone'] ?? '';
-                $user->pin = $employee['access_code'] ?? '';
-                $user->status = $employee['active'] ?? false;
-                $user->specialties = $this->getEmployeeSpecialties($empSpecialty);
-                $user->profile_id = $this->profile->id;
-                $user->agency_id = $this->setOrCreateAgency($employee['agency_id']);
-                $user->save();   
             }
+            
+            $user->uuid = $employee['external_id'];
+            $user->first_name = $employee['first_name'] ?? '';
+            $user->last_name = $employee['last_name'] ?? '';
+            $user->middle_name = $employee['middle_name'] ?? '';
+            $user->address = $employee['address'] ?? '';
+            $user->city = $employee['city'] ?? '';
+            $user->state = $employee['state'] ?? '';
+            $user->zipcode = $employee['zipcode'] ?? '';
+            $user->phone = $employee['phone'] ?? '';
+            $user->pin = $employee['access_code'] ?? '';
+            $user->status = $employee['active'] ?? false;
+            $user->specialties = $this->getEmployeeSpecialties($empSpecialty);
+            $user->profile_id = $this->profile->id;
+            $user->agency_id = $this->setOrCreateAgency($employee['agency_id']);
+            $user->timezone = $employee['time_zone'] ?? NULL;
+            $user->save();   
 
             array_push($this->processed['Employees'], $employee['external_id']);
        }
