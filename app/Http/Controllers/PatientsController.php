@@ -6,6 +6,7 @@ use App\Actions\UpsertPatientAction;
 use App\DataTransferObjects\PatientData;
 use App\Http\Requests\UpsertPatientRequest;
 use App\Http\Resources\PatientResource;
+use App\Http\Resources\PatientCollection;
 use App\Models\Patient;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -84,11 +85,13 @@ class PatientsController extends Controller
         $phone = $request->input('phone');
 
 
-        $patient = Patient::with('agency')
-                        ->where('phone',$phone)
+        $patients = Patient::with('agency')
+                        ->where('phone', $phone)
                         ->where('profile_id',$profile->id)
-                        ->first();
+                        ->get();
 
-        return PatientResource::make($patient);
+        return new PatientCollection($patients);
+
+       // return PatientCollection::make($patients);
     }
 }
