@@ -341,7 +341,7 @@ class Continulink
     public function retrieve($agency)
     {
         $visits = Visit::with('questionset.question','patient','user','agency','profile')
-                    ->whereDate('created_at', Carbon::today())
+                    ->whereDate('visit_start', Carbon::today())
                     ->where('agency_id', $agency->id)
                     ->get();
 
