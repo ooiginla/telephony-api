@@ -234,7 +234,7 @@ class Continulink
             $visit->visit_end = $this->convertVisitDate($schedule['end']) ?? null;
             $visit->visit_type = $schedule['type'] ?? '';
             $visit->schedule_type = $schedule['schedule_type'] ?? '';
-            $visit->status = (boolean) $schedule['active'] ?? false;
+            $visit->status = (strtolower($schedule['active'])) == "true" ? true : false;
             $visit->profile_id = $this->profile->id;
             $visit->save();
 

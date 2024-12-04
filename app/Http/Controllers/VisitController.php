@@ -67,6 +67,7 @@ class VisitController extends Controller
         
         $visit = Visit::where('profile_id', $profile->id)
                     ->where('is_complete', 0)
+                    ->where('status', 1)
                     ->whereDate('visit_start', Carbon::today());
 
         if(! empty($patient_id) && is_numeric($patient_id))
