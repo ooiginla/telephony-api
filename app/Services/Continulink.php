@@ -12,6 +12,7 @@ use App\Models\QuestionSet;
 use App\Models\Visit;
 use App\Models\User;
 use App\Models\Careplan;
+use App\Models\Telelog;
 use Carbon\Carbon;
 
 class Continulink
@@ -108,6 +109,8 @@ class Continulink
                 return;
             }
 
+            $this->logPath('employee', $employee['external_id'], $employee);
+
             $user = User::where('profile_id', $this->profile->id)->where('uuid', $employee['external_id'])->first();
 
             if (empty($user)) {
@@ -151,6 +154,8 @@ class Continulink
             if(empty($client)){
                 return;
             }
+
+            $this->logPath('client', $client['external_id'], $client);
 
             $patient = Patient::where('profile_id',$this->profile->id)->where('uuid',$client['external_id'])->first();
 
@@ -225,6 +230,8 @@ class Continulink
                 $visit = new Visit;
             }
 
+            $this->logPath('schedule', $schedule['id'], $schedule);
+
             $visit->agency_id = $this->setOrCreateAgency($schedule['agency_id']);
             $visit->uuid = $schedule['id'] ?? '';
             $visit->episode_id = $schedule['episode_id'] ?? '';
@@ -252,6 +259,8 @@ class Continulink
        {
             $agency_id = $this->setOrCreateAgency($careplanObj['agency_id']);
             $patient_id = $this->setOrCreateModel(new Patient, $agency_id, $careplanObj['external_id']);
+
+            $this->logPath('careplan', $careplanObj['id'], $careplanObj);
             
             if(isset($careplanObj['codes']) && !empty($careplanObj['codes'])) 
             {
@@ -286,6 +295,8 @@ class Continulink
             if(empty($taskcode)){
                 return;
             }
+
+            $this->logPath('tasks', $taskcode['id'], $taskObj);
 
             $question = Question::where('profile_id',$this->profile->id)->where('uuid',$taskcode['id'])->first();
 
@@ -452,5 +463,18 @@ class Continulink
         }
 
         return $data;
+    }
+
+    public function logPath($type, $uuid, $object)
+    {
+        try{
+            $telelog = new Telelog;
+            $telelog->type = $type;
+            $telelog->uuid = $uuid;
+            $telelog->payload = json_encode($object);
+            $telelog->save();
+        }catch(\Exception $e){
+            Log::error("Error Logging to log table: ".$e->getMessage());
+        }
     }
 }
