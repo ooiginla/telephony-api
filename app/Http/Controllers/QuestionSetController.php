@@ -12,7 +12,7 @@ class QuestionSetController extends Controller
     {
         $visit_id = $request->input('visit_id');
 
-        $tasks = QuestionSet::with('question:id,name,has_sound')
+        $tasks = QuestionSet::with('question:id,name,filename,has_sound')
                     ->where('visit_id', $visit_id)
                     ->select('question_sets.id as task_id','question_sets.question_id','question_sets.selected_key')
                     // ->whereNull('selected_key')

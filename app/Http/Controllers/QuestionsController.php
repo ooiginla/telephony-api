@@ -44,7 +44,7 @@ class QuestionsController extends Controller
         $msg = "Sound successfully updated";
 
         return response()->json([
-            "message" => $msg
+            "data" => $msg
         ]);
     }
 
