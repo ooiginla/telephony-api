@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('type', 20);
             $table->string('hash', 60);
             $table->json("choices")->nullable();
+            $table->string("filename", 600)->nullable();
             $table->boolean("has_sound")->default(false);
             $table->foreignId('agency_id')->constrained();
             $table->timestamps();

@@ -300,7 +300,14 @@ class Continulink
 
             $question = Question::where('profile_id',$this->profile->id)->where('uuid',$taskcode['id'])->first();
 
-            if (empty($question)) {
+            if (empty($question)) 
+            {
+                // Check if question has an existing hash
+                $hash = md5($taskcode['name']);
+                $sound = Question::where('hash', $hash)->where('has_sound', true)->first();
+                $filename = (!empty($sound)) ? $sound->filename : '';
+                $has_sound = (!empty($sound)) ? 1 : 0;
+
                 $question = new Question;
                 $question->uuid = $taskcode['id'];
                 $question->code = $taskcode['code'];
@@ -310,8 +317,9 @@ class Continulink
                 $question->profile_id = $this->profile->id;
                 $question->type = $taskcode['visit_type'];
                 $question->choices = json_encode(["1"=> "yes", "2" => "no", "3" => "refused"]);
-                $question->hash = md5($taskcode['name']);
-                $question->has_sound = 0;
+                $question->hash = $hash;
+                $question->filename = $filename;
+                $question->has_sound = $has_sound;
                 $question->save();
             }
 

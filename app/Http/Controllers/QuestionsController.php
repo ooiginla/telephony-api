@@ -31,20 +31,21 @@ class QuestionsController extends Controller
 
     public function postSoundGenerated(Request $request)
     {
-       $task_id = $request->input('id');
-       $name = $request->input("name");
+        $tasks = $request->input('data');
 
-       $status = Question::where('id', $task_id)->update(['has_sound' => true]);
+        foreach($tasks as $task)
+        {
+            Question::where('id', $task['id'])->update([
+                'has_sound' => true,
+                'filename' => $task['name']
+            ]);
+        }
 
-       if($status){
-            $msg = "Sound successfully pushed for id: ". $task_id . " - ". $name;
-       }else{
-        $msg = "Error updating sound updated event for question id: ". $task_id;
-       }
+        $msg = "Sound successfully updated";
 
-       return response()->json([
+        return response()->json([
             "message" => $msg
-       ]);
+        ]);
     }
 
     /**
