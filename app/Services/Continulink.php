@@ -266,15 +266,35 @@ class Continulink
             {
                 foreach($careplanObj['codes'] as $entry) 
                 {
-                    $question = Question::where('uuid', $entry['code'])
+                    $question = Question::where('code', $entry['code'])
                                     ->where('agency_id', $agency_id)
                                     ->first();
 
-                    $careplan = new Careplan;
-                    $careplan->uuid = $careplanObj['id'];
-                    $careplan->agency_id = $agency_id;
-                    $careplan->patient_id = $patient_id;
-                    $careplan->question_id = ($question) ? $question->id : null;
+                    // We don't even have the task in the first place
+                    if(empty($question)){
+                        continue;
+                    }
+
+                    $careplan = Careplan::where('uuid', $careplanObj['id'])
+                                    ->where('episode_id', $careplanObj['episode_id'])
+                                    ->where('patient_id', $patient_id)
+                                    ->where('agency_id', $agency_id)
+                                    ->where('question_id', $question->id)
+                                    ->first();
+
+                    if(empty($careplan)){
+                        $careplan = new Careplan;
+                        $careplan->uuid = $careplanObj['id'];
+                        $careplan->agency_id = $agency_id;
+                        $careplan->patient_id = $patient_id;
+                        $careplan->episode_id = $careplanObj['episode_id'] ?? '';
+                        $careplan->question_id = $question->id;
+                        
+                    }
+                    
+                    $careplan->discipline = $entry['discipline'] ?? '';
+                    $careplan->status = ($careplanObj['active']) ? true : false;
+                   
                     $careplan->save();    
                 }
             }
@@ -329,12 +349,15 @@ class Continulink
 
     public function loadQuestionSet($visit)
     {
-        $todays_questions = Careplan::where('patient_id', $visit->patient_id)->whereDate('created_at', Carbon::today())->get();
+        $visit_questions = Careplan::where('patient_id', $visit->patient_id)
+                                ->where('episode_id', $visit->episode_id)
+                                ->where('status',true)
+                                ->get();
 
         $counter = 1;
         $loaded_questions = [];
 
-        foreach($todays_questions as $question_entry)
+        foreach($visit_questions as $question_entry)
         {
             if(in_array($question_entry->question_id, $loaded_questions)){
                 continue;

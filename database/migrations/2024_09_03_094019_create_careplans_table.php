@@ -18,6 +18,8 @@ return new class extends Migration
             $table->foreignId('patient_id')->nullable();
             $table->foreignId('question_id')->nullable();
             $table->string('discipline',10)->nullable();
+            $table->string('episode_id',20)->nullable();
+            $table->boolean('status')->default(true);
             $table->timestamps();
         });
     }
