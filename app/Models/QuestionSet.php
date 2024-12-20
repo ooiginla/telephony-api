@@ -16,4 +16,9 @@ class QuestionSet extends Model
     {
         return $this->belongsTo(Question::class);
     }
+
+    public function visit()
+    {
+        return $this->belongsTo(Visit::class);
+    }
 }

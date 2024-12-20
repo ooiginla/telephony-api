@@ -261,6 +261,8 @@ class Continulink
             $patient_id = $this->setOrCreateModel(new Patient, $agency_id, $careplanObj['external_id']);
 
             $this->logPath('careplan', $careplanObj['id'], $careplanObj);
+
+            $has_tasks = false;
             
             if(isset($careplanObj['codes']) && !empty($careplanObj['codes'])) 
             {
@@ -294,12 +296,29 @@ class Continulink
                     
                     $careplan->discipline = $entry['discipline'] ?? '';
                     $careplan->status = ($careplanObj['active']) ? true : false;
-                   
-                    $careplan->save();    
+                    $careplan->save();
+                    
+                    $has_tasks = true;
                 }
             }
 
             array_push($this->processed['Careplans'], $careplanObj['id']);
+
+             // if careplan has tasks...push them to the visit
+             if($has_tasks)
+             {
+                // Try to load Question Set...if not previously loaded on visit.
+                $visits = Visit::where('episode_id', $careplanObj['episode_id'])
+                    ->where('patient_id', $patient_id)
+                    ->where('agency_id', $agency_id)
+                    ->where('visit_start','>', now())
+                    ->get();
+                
+                // reload careplan for future visits
+                foreach($visits as $visit) {
+                    $this->loadQuestionSet($visit);
+                }
+             }
         }
     }
 
