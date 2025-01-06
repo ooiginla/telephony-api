@@ -454,8 +454,8 @@ class Continulink
             array_push($transformed, [
                 "VisitId" => $visit->id,
                 "ScheduleId" => $visit->uuid,
-                "VisitStart" => $visit->visit_start,
-                "VisitEnd" => $visit->visit_end,
+                "VisitStart" => empty($visit->clock_in) ? $visit->visit_start : $visit->clock_in,
+                "VisitEnd" => empty($visit->clock_out) ? $visit->visit_end : $visit->clock_out,
                 "MileageQty" => 0,
                 "TravelEndDateTime" => "",
                 "TravelTimeInMinutes" => 0,
