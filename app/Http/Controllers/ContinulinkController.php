@@ -27,15 +27,17 @@ class ContinulinkController extends Controller
             'agency_id' => 'required'
         ]);
 
-        $agency_id = $request->input(['agency_id']);
+        $agency_id = $request->input('agency_id');
 
         $agency = Agency::where('uuid', $agency_id)->first();
+
+        $uuid = $request->input('uuid');
 
         if(empty($agency)){
             return response()->json(['status'=>false,'message'=>'agency not found', 'data' => []]);
         }
 
-        $response = $continulink->retrieve($agency);
+        $response = $continulink->retrieve($agency, $uuid);
 
         return response()->json($response);
     }

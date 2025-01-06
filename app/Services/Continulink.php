@@ -399,12 +399,19 @@ class Continulink
         }
     }
 
-    public function retrieve($agency)
+    public function retrieve($agency, $uuid =null)
     {
         $visits = Visit::with('questionset.question','patient','user','agency','profile')
-                    ->whereDate('visit_start', Carbon::today())
-                    ->where('agency_id', $agency->id)
-                    ->get();
+                    ->where('agency_id', $agency->id);
+
+
+        if(!empty($uuid)) {
+            $visits = $visits->where('uuid', $uuid);
+        }else{
+            $visits = $visits->whereDate('visit_start', Carbon::today());
+        }
+
+        $visits = $visits->get();
 
         $transformed = [];
         $calls = [];
@@ -489,7 +496,7 @@ class Continulink
         {
             array_push($data, [
                 "VisitID" => $schedule_id,
-                "DocID" => $entry->question->code,
+                "DocID" => $entry->question->code ?? '',
                 "Value" => base64_encode((string) $entry->selected_key),
                 "ValueLength" => 1,
                 "Type" => "Task",
