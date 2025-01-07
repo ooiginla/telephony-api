@@ -454,8 +454,8 @@ class Continulink
             array_push($transformed, [
                 "VisitId" => $visit->id,
                 "ScheduleId" => $visit->uuid,
-                "VisitStart" => empty($visit->clock_in) ? $visit->visit_start : $visit->clock_in,
-                "VisitEnd" => empty($visit->clock_out) ? $visit->visit_end : $visit->clock_out,
+                "VisitStart" => empty($visit->clock_in) ? $visit->visit_start : $this->convertToPatientTimezone($visit->clock_in, $visit),
+                "VisitEnd" => empty($visit->clock_out) ? $visit->visit_end : $this->convertToPatientTimezone($visit->clock_out, $visit),
                 "MileageQty" => 0,
                 "TravelEndDateTime" => "",
                 "TravelTimeInMinutes" => 0,
@@ -492,11 +492,22 @@ class Continulink
         $data = [];
         $answers = [1 => 'yes', 2 => 'no'];
 
+        // Add schedule documentation
+        array_push($data, [
+            "VisitID" => $schedule_id,
+            "DocumentID" => $schedule_id,
+            "Value" => "",
+            "ValueLength" => 1,
+            "Type" => "Schedule",
+            "Reason" => null
+        ]);
+
+        // Add tasks documentation
         foreach($questionset as $entry)
         {
             array_push($data, [
                 "VisitID" => $schedule_id,
-                "DocID" => $entry->question->code ?? '',
+                "DocumentID" => $entry->question->code ?? '',
                 "Value" => base64_encode((string) $entry->selected_key),
                 "ValueLength" => 1,
                 "Type" => "Task",
@@ -533,5 +544,23 @@ class Continulink
         }catch(\Exception $e){
             Log::error("Error Logging to log table: ".$e->getMessage());
         }
+    }
+
+    public function convertToPatientTimezone($datestr, $visit)
+    {
+        // clinician timezone
+        $user = User::find($visit->user_id);
+        $timezone = $user->timezone;
+        $format = "Y-m-d H:i:s";
+    
+        $timezone = (int) $timezone;
+        $offset= abs($timezone) * 60 * 60;
+    
+        $datestr = empty($datestr) ? time() : strtotime($datestr);
+    
+        $timestamp = ($timezone < 0) ? $datestr - $offset : $datestr + $offset;
+        $final_date = gmdate($format, $timestamp);
+        
+        return $final_date;
     }
 }
