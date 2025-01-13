@@ -57,6 +57,23 @@ class VisitController extends Controller
 
     }
 
+    public function convertToTimezone($datestr, $user_id, $format="Y-m-d H:i:s")
+    {
+        // clinician timezone
+        $user = User::find($user_id);
+        $timezone = $user->timezone;
+    
+        $timezone = (int) $timezone;
+        $offset= abs($timezone) * 60 * 60;
+    
+        $datestr = empty($datestr) ? time() : strtotime($datestr);
+    
+        $timestamp = ($timezone < 0) ? $datestr - $offset : $datestr + $offset;
+        $final_date = gmdate($format, $timestamp);
+        
+        return $final_date;
+    }
+
      /**
      * Display the specified resource.
      */
@@ -64,15 +81,48 @@ class VisitController extends Controller
     {
         $profile = $request->input('profile');
         $patient_id = $request->input('patient_id');
-        
-        $visit = Visit::where('profile_id', $profile->id)
-                    ->where('is_complete', 0)
-                    ->where('status', 1)
-                    ->whereDate('visit_start', Carbon::today());
+        $employee_id = $request->input('employee_id');
 
-        if(! empty($patient_id) && is_numeric($patient_id))
-        {
+        // Check if there is any open visit in the last 24 hours of users timezone
+
+        
+        $visit = Visit::query()
+                    ->where('profile_id', $profile->id)
+                    ->where('is_complete', 0)
+                    ->where('status', 1);
+
+        if (! empty($patient_id) && is_numeric($patient_id)) {
             $visit = $visit->where('patient_id',$patient_id);
+        }
+
+        // if employee added, streamline and use employee timezone to fetch
+        if (!empty($employee_id)) 
+        {
+            $visit = $visit->where('user_id',$employee_id);
+            $employeetz_date = $this->convertToTimezone(gmdate("Y-m-d H:i:s"), $employee_id, "Y-m-d");
+
+            $date_object = date_create($employeetz_date);
+            date_sub($date_object,date_interval_create_from_date_string("1 days"));
+            $prev_day = date_format($date_object,"Y-m-d");
+
+            // prev day visits opened & not closed
+            $preVisit = clone $visit;
+            $visits_opened_not_closed = $preVisit->whereDate('visit_start', $prev_day)
+                                        ->whereNotNull('clock_in')
+                                        ->whereNull('clock_out')
+                                        ->get();
+            
+            if($visits_opened_not_closed->count() >= 1) 
+            {
+                return response([
+                    'data' => $visits_opened_not_closed
+                ]);
+            }
+
+            // No opened previous days visit?
+            $visit = $visit->whereDate('visit_start', $employeetz_date);
+        }else{
+            $visit = $visit->whereDate('visit_start', Carbon::today());
         }
 
         $visits = $visit->get();

@@ -454,8 +454,8 @@ class Continulink
             array_push($transformed, [
                 "VisitId" => $visit->id,
                 "ScheduleId" => $visit->uuid,
-                "VisitStart" => empty($visit->clock_in) ? $visit->visit_start : $this->convertToPatientTimezone($visit->clock_in, $visit),
-                "VisitEnd" => empty($visit->clock_out) ? $visit->visit_end : $this->convertToPatientTimezone($visit->clock_out, $visit),
+                "VisitStart" => empty($visit->clock_in) ? $visit->visit_start : $this->convertToPatientTimezone($visit->clock_in, $visit->user_id),
+                "VisitEnd" => empty($visit->clock_out) ? $visit->visit_end : $this->convertToPatientTimezone($visit->clock_out, $visit->user_id),
                 "MileageQty" => 0,
                 "TravelEndDateTime" => "",
                 "TravelTimeInMinutes" => 0,
@@ -546,10 +546,10 @@ class Continulink
         }
     }
 
-    public function convertToPatientTimezone($datestr, $visit)
+    public function convertToPatientTimezone($datestr, $user_id)
     {
         // clinician timezone
-        $user = User::find($visit->user_id);
+        $user = User::find($user_id);
         $timezone = $user->timezone;
         $format = "Y-m-d H:i:s";
     
