@@ -200,7 +200,7 @@ class Continulink
         $pattern = "/[-\s:\/]/";
         $comp = preg_split($pattern, $date);
 
-        if($comp[6] == "PM"){
+        if($comp[6] == "PM" && $comp[3] < 12){
             $comp[3] = $comp[3] + 12;
         }
         
