@@ -418,6 +418,8 @@ class Continulink
 
         foreach($visits as $visit)
         {
+            $calls = [];
+            
             // Clocked In and Out?
             if(!empty($visit->clock_out))
             {
