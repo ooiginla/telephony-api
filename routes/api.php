@@ -45,3 +45,4 @@ Route::any("/update-sound",[QuestionsController::class,'postSoundGenerated']);
 
 Route::any('/ExecuteDNDSend', [ContinulinkController::class, 'send']);
 Route::any('/ExecuteDNDReceive', [ContinulinkController::class, 'receive']);
+Route::any('/ExecuteDNDAcknowledge', [ContinulinkController::class, 'acknowledge']);

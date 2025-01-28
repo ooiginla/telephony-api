@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('schedule_type')->nullable();
             $table->boolean('status')->nullable();
             $table->boolean('is_complete')->default(false);
+            $table->boolean('is_acknowledged')->default(true);
             $table->timestamps();
             $table->foreignId("profile_id")->constrained();
         });

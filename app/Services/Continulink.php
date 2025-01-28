@@ -408,7 +408,8 @@ class Continulink
         if(!empty($uuid)) {
             $visits = $visits->where('uuid', $uuid);
         }else{
-            $visits = $visits->whereBetween('visit_start', [Carbon::yesterday(), date("Y-m-d 23:59:59")]);
+            $visits = $visits->whereBetween('visit_start', [Carbon::yesterday(), date("Y-m-d 23:59:59")])
+                             ->where('is_acknowledged', false);
         }
 
         $visits = $visits->get();
