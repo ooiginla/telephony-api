@@ -10,6 +10,8 @@ use App\Models\Visit;
 use App\Models\Question;
 use App\Models\QuestionSet;
 use Carbon\Carbon;
+use DateTimeZone;
+use DateTime;
 
 class VisitController extends Controller
 {
@@ -74,7 +76,7 @@ class VisitController extends Controller
         return $final_date;
     }
 
-     /**
+    /**
      * Display the specified resource.
      */
     public function index(Request $request)

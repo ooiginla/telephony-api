@@ -156,6 +156,7 @@ class Continulink
             }
 
             $this->logPath('client', $client['external_id'], $client);
+            $this->logPath('episode', $client['external_id'], $episode);
 
             $patient = Patient::where('profile_id',$this->profile->id)->where('uuid',$client['external_id'])->first();
 
@@ -172,6 +173,7 @@ class Continulink
                 $patient->phone = $this->grabClientPhone($clientPhones);
                 $patient->profile_id = $this->profile->id;
                 $patient->agency_id = $this->setOrCreateAgency($client['agency_id']);
+                $patient->timezone = $episode->timezone ?? 0;
                 $patient->save();
             }
 
@@ -194,19 +196,18 @@ class Continulink
         return $object->id;
     }
 
-    public function convertVisitDate($date)
+    public function convertVisitDate($inputDate)
     {
-        // sample - "4/29/2019 1:00:00 PM
-        $pattern = "/[-\s:\/]/";
-        $comp = preg_split($pattern, $date);
-
-        if($comp[6] == "PM" && $comp[3] < 12){
-            $comp[3] = $comp[3] + 12;
+        // Matches "4/29/2019 12:00:00 AM"
+        $timezone = 'UTC';
+        $format = 'n/j/Y h:i:s A'; 
+        $date = DateTime::createFromFormat($format, $inputDate, new DateTimeZone($timezone));
+    
+        if (!$date) {
+            return false;
         }
-        
-        $timestamp = mktime($comp[3], $comp[4], $comp[5], $comp[0], $comp[1], $comp[2]);
 
-        return date("Y-m-d H:i:s", $timestamp);
+        return $date->format('Y-m-d H:i:s');
     }
 
     public function processVisit($item) 
